@@ -125,7 +125,7 @@ def analysis():
     # view_sample_part_column_compare(sample_data_ori, sample_data_nor,fetrures_X_00to01, '00to01')
     # view_sample_part_column_compare(sample_data_ori, sample_data_nor,fetrures_X_01to02, '01to02')
     # view_sample_part_column_compare(sample_data_ori, sample_data_nor,fetrures_X_07to08, '07to08')
-    view_sample_part_column_compare(sample_data_ori, sample_data_nor,fetrures_all, 'all')
+    view_sample_part_column_compare(sample_data_ori, sample_data_nor,fetrures_all, 'test')
 
 
 

@@ -19,6 +19,12 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
 from common_tool import config_manager as cfg
+from sklearn2pmml import sklearn2pmml
+from sklearn2pmml.pipeline import PMMLPipeline
+from sklearn2pmml.decoration import ContinuousDomain
+from sklearn_pandas import DataFrameMapper
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 
 import os
 import sys
@@ -32,6 +38,10 @@ pd.set_option('display.width', 1000)
 
 sample_path = cfg.get_config('file', 'sample_path')
 print('sample_path:', sample_path)
+print(os.path.abspath(__file__))
+print(os.path.dirname(os.path.abspath(__file__)))
+print(BASE_DIR)
+print(sys.path)
 # PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 # print(PROJECT_ROOT)
 # file_path = os.path.join(PROJECT_ROOT,"data\\edge\\0_fuse.txt")
@@ -99,8 +109,10 @@ featrures_X_del = []
 
 def model_lr_fit(train_x, train_y, features_list):
     # 带入逻辑回归模型进行训练
-    lr_model = LogisticRegression()
-    lr_model.fit(train_x, train_y)
+    lr_model = LogisticRegression(multi_class='ovr', max_iter=200)
+    # lr_model.fit(train_x, train_y)
+    # 训练+保存模型信息
+    lr_model = model_save(lr_model, train_x, train_y)
     print('模型实际迭代次数：', lr_model.n_iter_)
     features_weight = lr_model.coef_[0]
     df_weight = pd.DataFrame()
@@ -305,9 +317,18 @@ def model_flow_2():
             print(getattr(row, 'feature'), getattr(row, 'weight'))  # 输出每一行
             # featrures_X_del.append(getattr(row, 'feature'))
 
+def model_save(model, data_x, data_y):
+    pipeline = PMMLPipeline([("classifier", model)])
+    pipeline.fit(data_x, data_y)
+    sklearn2pmml(pipeline, "LogisticRegressionIris.pmml", with_repr=True)
+    return model
 
 def model_stay_features():
-    features_use = ['charge_wait_time','web_ch_30min_click_pt_top5_rt','web_ch_30min_ua_norepeat_rt','web_ch_5day_top60min_every_day_ratio','web_ch_charge_ctime_ret1_ratio_day','web_ch_charge_ip_avg_charge_day','web_ch_charge_phone_provT1Ratio_day','web_ch_charge_uaRatio_month','web_ip_10min_suc_ct','web_ip_charge_succ_ratio_week','web_ip_distinct_succ_phone_day','web_ip_succ_distinct_ch_week','web_ip_total_count_week','web_phone_10min_charge_ct','web_phone_distinct_ua_day','web_phone_success_count_week','web_phone_total_count_week']
+    # features_use = ['charge_wait_time','web_ch_30min_click_pt_top5_rt','web_ch_30min_ua_norepeat_rt','web_ch_5day_top60min_every_day_ratio','web_ch_charge_ctime_ret1_ratio_day','web_ch_charge_ip_avg_charge_day','web_ch_charge_phone_provT1Ratio_day','web_ch_charge_uaRatio_month','web_ip_10min_suc_ct','web_ip_charge_succ_ratio_week','web_ip_distinct_succ_phone_day','web_ip_succ_distinct_ch_week','web_ip_total_count_week','web_phone_10min_charge_ct','web_phone_distinct_ua_day','web_phone_success_count_week','web_phone_total_count_week']
+    # features_use = ['charge_wait_time','web_ch_30min_click_pt_top5_rt','web_ch_30min_ua_norepeat_rt','web_ch_5day_top60min_every_day_ratio','web_ch_charge_across_city_ratio_day','web_ch_charge_conversion_ratio_day','web_ch_charge_ctime_ret1_ratio_day','web_ch_charge_ctime_ret3_ratio_day','web_ch_charge_ctime_ret5_ratio_day','web_ch_charge_ip_avg_charge_day','web_ch_charge_ip_avg_charge_week','web_ch_charge_phone_provT1Ratio_day','web_ch_charge_phone_provT1Ratio_month','web_ch_charge_suc_ratio_week','web_ch_charge_uaRatio_day','web_ch_charge_uaRatio_month','web_ch_charge_vsRatio_day','web_ch_charge_vsRatio_month','web_ip_10min_suc_ct','web_ip_charge_succ_ratio_day','web_ip_charge_succ_ratio_month','web_ip_charge_succ_ratio_week','web_ip_succ_distinct_ch_day','web_ip_succ_distinct_ch_month','web_ip_succ_distinct_ch_week','web_ip_total_count_day','web_ip_total_count_month','web_ip_total_count_week','web_phone_10min_charge_ct','web_phone_chargetype1_count_day','web_phone_chargetype1_count_month','web_phone_chargetype1_count_week','web_phone_distinct_ua_day','web_phone_distinct_ua_month','web_phone_distinct_ua_week','web_phone_ip_diff_prov_ratio_month','web_phone_success_count_day','web_phone_success_count_month','web_phone_success_count_week','web_phone_total_count_day','web_phone_total_count_month','web_phone_total_count_week','wseb_ch_charge_uaT5Ratio_day']
+    # features_use = ['web_ch_charge_vsRatio_month','web_phone_chargetype1_count_week','web_phone_chargetype1_count_month','web_ch_charge_ctime_ret3_ratio_day','web_phone_total_count_month','web_ch_charge_vsRatio_day','web_phone_distinct_ua_month','web_ch_charge_across_city_ratio_day','web_ch_30min_click_pt_top5_rt','web_ip_succ_distinct_ch_day','web_phone_distinct_ua_week','wseb_ch_charge_uaT5Ratio_day','web_ch_charge_suc_ratio_week','web_phone_total_count_week','web_ip_total_count_week','web_phone_success_count_week','web_ip_total_count_month','web_ch_30min_ua_norepeat_rt','charge_wait_time','web_ch_charge_ip_avg_charge_week','web_ch_5day_top60min_every_day_ratio','web_ch_charge_ctime_ret5_ratio_day','web_ch_charge_uaRatio_month','web_ch_charge_ip_avg_charge_day','web_ip_succ_distinct_ch_week','web_ip_10min_suc_ct','web_phone_success_count_month','web_ip_succ_distinct_ch_month','web_ch_charge_ctime_ret1_ratio_day','web_phone_chargetype1_count_day','web_ip_charge_succ_ratio_day','web_ch_charge_phone_provT1Ratio_day','web_phone_total_count_day','web_ip_charge_succ_ratio_month','web_phone_success_count_day','web_ch_charge_uaRatio_day']
+    features_use = ['web_ch_charge_vsRatio_day','web_ch_charge_across_city_ratio_day','web_ch_30min_click_pt_top5_rt','web_ip_succ_distinct_ch_day','web_phone_distinct_ua_week','wseb_ch_charge_uaT5Ratio_day','web_ch_charge_suc_ratio_week','web_ip_total_count_week','web_phone_success_count_week','web_ch_30min_ua_norepeat_rt','charge_wait_time','web_ch_charge_ip_avg_charge_week','web_ch_charge_ctime_ret5_ratio_day','web_ch_charge_uaRatio_month','web_ch_charge_phone_provT1Ratio_month','web_ip_10min_suc_ct','web_ch_charge_ctime_ret1_ratio_day','web_phone_chargetype1_count_day','web_ch_charge_phone_provT1Ratio_day','web_phone_total_count_day','web_ip_charge_succ_ratio_month']
+
     print("\n需要的特征数量:", len(features_use))
     df = model_execute(features_use)
     df = df.reindex(df['weight'].abs().sort_values(ascending=False).index)

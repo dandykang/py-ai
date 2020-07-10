@@ -45,6 +45,8 @@ def column_describe(input_df, col):
 
 
 def column_compare_subplot(ori_df, normal_df, compare_col_list, y_label, pic_name):
+    positive_nor_df = []
+    negative_nor_df = []
     df_col_list = ori_df.columns.values.tolist()
     positive_ori_df = ori_df[ori_df[y_label] == 1]
     negative_ori_df = ori_df[ori_df[y_label] == 0]
@@ -57,27 +59,27 @@ def column_compare_subplot(ori_df, normal_df, compare_col_list, y_label, pic_nam
                        (len(negative_ori_df) / (len(negative_ori_df) + len(positive_ori_df)) * 100)))
     for compare_col in compare_col_list:
         if compare_col in df_col_list:
-            if len(normal_df) > 0:
-                column_compare_subplot2(positive_ori_df, negative_ori_df, positive_nor_df, negative_nor_df, compare_col,pic_name)
-            else:
-                column_compare_subplot2(positive_ori_df, negative_ori_df, compare_col, pic_name)
+            column_compare_subplot2(positive_ori_df, negative_ori_df, positive_nor_df, negative_nor_df,
+                                    compare_col, pic_name)
         else:
             log.logger.info('分析数据中，不包含column：%s 的列' % (compare_col))
 
 
 def column_compare_subplot2(positive_ori_df, negative_ori_df, positive_nor_df, negative_nor_df, col, pic_name):
     try:
-        col_desc1 = str(positive_ori_df[col].describe(percentiles=[.9, .95, .99]))
-        col_desc2 = str(negative_ori_df[col].describe(percentiles=[.9, .95, .99]))
-        col_desc3 = str(positive_nor_df[col].describe(percentiles=[.9, .95, .99]))
-        col_desc4 = str(negative_nor_df[col].describe(percentiles=[.9, .95, .99]))
+        plt.rcParams['font.sans-serif'] = ['SimHei']  # 显示中文标签
+        plt.rcParams['axes.unicode_minus'] = False  # 这两行需要手动设置
+        col_desc1 = str(positive_ori_df[col].describe(percentiles=[.1, .25, .5, .75, .90, .95]))
+        col_desc2 = str(negative_ori_df[col].describe(percentiles=[.1, .25, .5, .75, .90, .95]))
+        col_desc3 = str(positive_nor_df[col].describe(percentiles=[.1, .25, .5, .75, .90, .95]))
+        col_desc4 = str(negative_nor_df[col].describe(percentiles=[.1, .25, .5, .75, .90, .95]))
         if len(positive_nor_df) > 0 and len(negative_nor_df) > 0:
             f, [[ax1, ax2], [ax3, ax4]] = plt.subplots(2, 2, figsize=(12, 10))
             # 设置子标题
-            ax1.set_title('ori-positive')
-            ax2.set_title('ori-negative')
-            ax3.set_title('nor-positive')
-            ax4.set_title('nor-negative')
+            ax1.set_title('原始数据-正')
+            ax2.set_title('原始数据-负')
+            ax3.set_title('最终数据-正')
+            ax4.set_title('最终数据-负')
             sns.distplot(positive_ori_df[col], kde_kws={"label": col_desc1}, ax=ax1)
             sns.distplot(negative_ori_df[col], kde_kws={"label": col_desc2}, ax=ax2)
             sns.distplot(positive_nor_df[col], kde_kws={"label": col_desc3}, ax=ax3)
@@ -88,12 +90,12 @@ def column_compare_subplot2(positive_ori_df, negative_ori_df, positive_nor_df, n
         else:
             f, [ax1, ax2] = plt.subplots(1, 2, figsize=(12, 5))
             # 设置子标题
-            ax1.set_title('ori-positive')
-            ax2.set_title('ori-negative')
+            ax1.set_title('原始数据-正')
+            ax2.set_title('原始数据-负')
             sns.distplot(positive_ori_df[col], kde_kws={"label": col_desc1}, ax=ax1)
             sns.distplot(negative_ori_df[col], kde_kws={"label": col_desc2}, ax=ax2)
 
-            plt.savefig('sample_pic\\compare\\compare_' + col + '.png')
+            plt.savefig('sample_pic\\compare\\' + pic_name + '_compare_' + col + '.png')
             # plt.show()
 
     except Exception as e:
@@ -117,7 +119,7 @@ if __name__ == '__main__':
     df3 = pd.DataFrame(data={'age': [2, 3, 13, 124], 'name': ['jack', 'mick', 'john', 'aaa']})
     df4 = pd.DataFrame(data={'age': [2, 3, 13, 124], 'name': ['jack', 'mick', 'john', 'aaa']})
     # column_compare_subplot2(df1, df2, df3, df4, 'age', '')
-    aa = df3.describe(percentiles=[.8, .9])
+    aa = df3.describe(percentiles=[.1, .25, .8, .9])
     print(aa)
     # 调节具体参数
     # bins调节横坐标分区个数，alpha参数用来设置透明度
