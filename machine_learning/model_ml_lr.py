@@ -17,6 +17,10 @@ from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import confusion_matrix
+import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
 import seaborn as sns
 from common_tool import config_manager as cfg
 from sklearn2pmml import sklearn2pmml
@@ -25,11 +29,6 @@ from sklearn2pmml.decoration import ContinuousDomain
 from sklearn_pandas import DataFrameMapper
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
-
-import os
-import sys
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(BASE_DIR)
 
 # 导入后加入以下列，再显示时显示完全。
 pd.set_option('display.max_rows', 500)
