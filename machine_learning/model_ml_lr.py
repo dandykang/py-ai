@@ -29,6 +29,8 @@ from sklearn2pmml.decoration import ContinuousDomain
 from sklearn_pandas import DataFrameMapper
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
+import pickle
+from sklearn.externals import joblib
 
 # 导入后加入以下列，再显示时显示完全。
 pd.set_option('display.max_rows', 500)
@@ -320,6 +322,10 @@ def model_save(model, data_x, data_y):
     pipeline = PMMLPipeline([("classifier", model)])
     pipeline.fit(data_x, data_y)
     sklearn2pmml(pipeline, "LogisticRegressionIris.pmml", with_repr=True)
+
+    # 保存成pkl
+    # joblib.dump(model, 'LogisticRegressionIris.pkl')
+    # clf2 = joblib.load('LogisticRegressionIrispkl')
     return model
 
 def model_stay_features():
